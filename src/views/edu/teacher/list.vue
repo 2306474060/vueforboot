@@ -1,102 +1,63 @@
 <template>
   <div class="teacherList">
 
-    <el-form :inline="true" :model="teacherQueryVO" class="demo-form-inline" style="margin-top: 25px;margin-left: 25px">
-      <el-form-item label="审批人">
-        <el-input v-model="teacherQueryVO.name" placeholder="审批人"/>
+    <!--查询表单-->
+    <el-form :inline="true" class="demo-form-inline">
+      <el-form-item>
+        <el-input v-model="teacherQuery.name" placeholder="讲师名"/>
       </el-form-item>
-      <el-form-item label="活动区域">
-        <el-select v-model="teacherQueryVO.level" placeholder="活动区域">
-          <el-option label="普通教师" value="1"/>
-          <el-option label="高级教师" value="2"/>
+      <el-form-item>
+        <el-select v-model="teacherQuery.level" clearable placeholder="讲师头衔">
+          <el-option :value="1" label="高级讲师"/>
+          <el-option :value="2" label="首席讲师"/>
         </el-select>
       </el-form-item>
-      <!--
-      <el-form-item label="活动时间">
-        <el-col :span="11">
-          <el-date-picker v-model="teacherQueryVO.gmtCreate" type="date" placeholder="选择日期" style="width: 100%;"/>
-        </el-col>
-        <el-col :span="2" class="line">-</el-col>
-        <el-col :span="11">
-          <el-time-picker v-model="teacherQueryVO.gmtModified" placeholder="选择时间" style="width: 100%;"/>
-        </el-col>
-      </el-form-item>
-      -->
-      <el-form-item>
-        <el-button type="primary" @click="getList">查询</el-button>
-        <el-button type="default" @click="resetData()">清空</el-button>
-      </el-form-item>
+
+      <el-button type="primary" icon="el-icon-search" @click="fetchData()">查询</el-button>
+      <el-button type="default" @click="resetData()">清空</el-button>
     </el-form>
 
     <el-table
       :data="list"
-      style="width: 100%">
-      <div style="display: none">
-        <el-table-column
-          label="id"
-          width="230">
-          <template slot-scope="scope">
-            <i class="el-icon-time"/>
-            <span style="margin-left: 10px">{{ scope.row.id }}</span>
-          </template>
-        </el-table-column>
-      </div>
+      border
+      fit
+      highlight-current-row>
       <el-table-column
-        label="日期"
-        width="230">
+        label="序号"
+        width="70"
+        align="center">
         <template slot-scope="scope">
-          <i class="el-icon-time"/>
-          <span style="margin-left: 10px">{{ scope.row.gmtCreate }}</span>
+          {{ (page - 1) * limit + scope.$index + 1 }}
         </template>
       </el-table-column>
-      <el-table-column
-        label="姓名"
-        width="180">
+      <el-table-column prop="name" label="名称" width="80" />
+      <el-table-column label="头衔" width="80">
         <template slot-scope="scope">
-          <el-popover trigger="hover" placement="top">
-            <p>姓名: {{ scope.row.name }}</p>
-            <p>住址: {{ scope.row.career }}</p>
-            <div slot="reference" class="name-wrapper">
-              <el-tag size="medium">{{ scope.row.name }}</el-tag>
-            </div>
-          </el-popover>
+          {{ scope.row.level===1?'高级讲师':'首席讲师' }}
         </template>
       </el-table-column>
-      <el-table-column
-        label="资历"
-        width="230">
+      <el-table-column prop="career" label="资历" />
+      <el-table-column prop="gmtCreate" label="添加时间" width="160"/>
+      <el-table-column prop="sort" label="排序" width="60" />
+      <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.career }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="头衔"
-        width="230">
-        <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.level === 1 ? '普通教师' : '高级教师' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作">
-        <template slot-scope="scope">
-          <el-button
-            size="mini">编辑</el-button>
-          <el-button
-            size="mini"
-            type="danger">删除</el-button>
+          <router-link :to="'/edu/teacher/edit/'+scope.row.id">
+            <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
+          </router-link>
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeDataById(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <div class="block">
-      <el-pagination
-        :current-page="page"
-        :page-size="limit"
-        :total="total"
-        layout="total, prev, pager, next, jumper"
-        style="padding: 30px 0;text-align: center"
-        @current-change="getList"
-      />
-    </div>
 
+    <!-- 分页 -->
+    <el-pagination
+      :current-page="page"
+      :page-size="limit"
+      :total="total"
+      style="padding: 30px 0; text-align: center;"
+      layout="total, prev, pager, next, jumper"
+      @current-change="fetchData"
+    />
 </div></template>
 
 <script>
@@ -106,35 +67,38 @@ export default {
   name: 'List',
   data() {
     return {
-      list: null,
-      page: 1,
-      limit: 4,
-      total: 0,
-      teacherQueryVO: {}
+      list: null, // 数据列表
+      total: 0, // 总记录数
+      page: 1, // 页码
+      limit: 4, // 每页记录数
+      teacherQuery: {
+        name: '',
+        level: ''
+      }// 查询条件
     }
   },
   created() {
-    this.getList()
+    this.fetchData()
   },
   methods: {
-
-    getList(page = 1) {
+    fetchData(page = 1) { // 调用api层获取数据库中的数据
+      console.log('加载列表')
       this.page = page
-      teacher.getTeacherList(this.page, this.limit, this.teacherQueryVO)
-        .then(reponse => {
-          this.list = reponse.data.items.records
-          this.total = reponse.data.items.total
-          console.log(reponse)
-        })
-        .catch(error => { console.log(error) }
-        )
+      teacher.getPageList(this.page, this.limit, this.teacherQuery).then(response => {
+        // debugger 设置断点调试
+        console.log(response)
+        if (response.success === true) {
+          this.list = response.data.items.records
+          this.total = response.data.total
+        }
+      })
     },
-
     resetData() {
-      this.teacherQueryVO = {}
-      this.getList()
+      this.teacherQuery = {}
+      this.fetchData()
     }
   }
+
 }
 </script>
 

@@ -1,13 +1,12 @@
 import request from '@/utils/request'
+import qs from 'qs'
 
 export default {
-  getTeacherList(page, limit, teacherQueryVO) {
+  getPageList(page, limit, teacherQuery) {
     return request({
       url: `/edu-teacher/getCondition/${page}/${limit}`,
-      //      url: '/edu-teacher/getCondition/' + current + '/' + limit,
-      method: 'post',
-      data: teacherQueryVO // qs.stringify(teacherQueryVO),
-
+      method: 'get',
+      params: teacherQuery
     })
   }
 }
