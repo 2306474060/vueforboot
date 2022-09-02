@@ -13,11 +13,14 @@ import router from './router'
 import store from './store'
 
 import '@/icons' // icon
-import '@/permission' // permission control
+import '@/permission'
+import axios from 'axios'; // permission control
 
 Vue.use(ElementUI, { locale })
 
 Vue.config.productionTip = false
+
+Vue.prototype.$axios = axios
 
 new Vue({
   el: '#app',
