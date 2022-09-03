@@ -41,10 +41,10 @@
       <el-table-column prop="sort" label="排序" width="60" />
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <router-link :to="'/edu/teacher/edit/'+scope.row.id">
+          <router-link :to="'/edit/'+scope.row.id">
             <el-button type="primary" size="mini" icon="el-icon-edit">修改</el-button>
           </router-link>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="removeDataById(scope.row.id)">删除</el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteById(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -93,6 +93,27 @@ export default {
         }
       })
     },
+
+    deleteById(id) {
+      this.$confirm('此操作将永久删除该, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        teacher.deleteById(id).then(response => {
+          // debugger 设置断点调试
+          console.log(response)
+          if (response.success === true) {
+            this.fetchData()
+          }
+        })
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      })
+    },
+
     resetData() {
       this.teacherQuery = {}
       this.fetchData()
