@@ -51,14 +51,25 @@ export default {
       saveBtnDisabled: false // 保存按钮是否禁用,
     }
   },
-  created() {
-    // 判断路由是否有传参数有传就调用该方法
-    if (this.$route.params && this.$route.params.id) {
-      const id = this.$route.params.id
-      this.getInfo(id)
+  watch: {
+    $route(to, from) {
+      this.init()
     }
   },
+  created() {
+    // 判断路由是否有传参数有传就调用该方法
+    this.init()
+  },
   methods: {
+    init() {
+      if (this.$route.params && this.$route.params.id) {
+        const id = this.$route.params.id
+        this.getInfo(id)
+      } else {
+        this.eduTeacher = {}
+      }
+    },
+
     saveOrUpdate(eduTeacher) {
       this.saveBtnDisabled = true
       teacher.saveOrUpdate(eduTeacher).then(response => {
