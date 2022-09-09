@@ -3,27 +3,27 @@ import request from '@/utils/request'
 export default {
   getPageList(page, limit, teacherQuery) {
     return request({
-      url: `/edu-teacher/getCondition/${page}/${limit}`,
+      url: `/eduservice/edu-teacher/getCondition/${page}/${limit}`,
       method: 'get',
       params: teacherQuery
     })
   },
   deleteById(id) {
     return request({
-      url: `/edu-teacher/delete/${id}`,
+      url: `/eduservice/edu-teacher/delete/${id}`,
       method: 'delete'
     })
   },
   save(eduTeacher) {
     return request({
-      url: `/edu-teacher/add`,
+      url: `/eduservice/edu-teacher/add`,
       method: 'post',
       data: eduTeacher
     })
   },
   saveOrUpdate(eduTeacher) {
     return request({
-      url: `/edu-teacher/saveOrUpdate`,
+      url: `/eduservice/edu-teacher/saveOrUpdate`,
       method: 'post',
       data: eduTeacher
     })
@@ -31,7 +31,7 @@ export default {
 
   getTeacher(id) {
     return request({
-      url: `/edu-teacher/get/${id}`,
+      url: `/eduservice/edu-teacher/get/${id}`,
       method: 'get'
     })
   }

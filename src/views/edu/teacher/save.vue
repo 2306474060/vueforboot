@@ -27,6 +27,34 @@
         <el-input v-model="eduTeacher.intro" :rows="10" type="textarea"/>
       </el-form-item>
       <!-- 讲师头像：TODO -->
+      <!-- 讲师头像 -->
+      <el-form-item label="讲师头像">
+        <!-- 头衔缩略图 -->
+        <pan-thumb :image="eduTeacher.avatar"/>
+        <!-- 文件上传按钮 -->
+        <el-button type="primary" icon="el-icon-upload" @click="imagecropperShow=true">更换头像
+        </el-button>
+        <!--
+    11
+    v-show：是否显示上传组件
+    12
+    :key：类似于id，如果一个页面多个图片上传控件，可以做区分
+    13
+    :url：后台上传的url地址
+    14
+    @close：关闭上传组件
+    15
+    @crop-upload-success：上传成功后的回调 -->
+        <image-cropper
+          v-show="imagecropperShow"
+          :width="300"
+          :height="300"
+          :key="imagecropperKey"
+          :url="BASE_API+'/eduoss/upload'"
+          field="file"
+          @close="close"
+          @crop-upload-success="cropSuccess"/>
+      </el-form-item>
       <el-form-item>
         <el-button :disabled="saveBtnDisabled" type="primary" @click="save(eduTeacher)">保存</el-button>
       </el-form-item>
@@ -36,8 +64,12 @@
 
 <script>
 import teacher from '@/api/teacher/teacher'
+import process from 'shelljs'
+import ImageCropper from '@/components/ImageCropper'
+import PanThumb from '@/components/PanThumb'
 export default {
   name: 'Save',
+  components: { ImageCropper, PanThumb },
   data() {
     return {
       eduTeacher: {
@@ -48,6 +80,9 @@ export default {
         intro: '',
         avatar: ''
       },
+      imagecropperShow: false,
+      imagecropperKey: 0,
+      BASE_API: process.env.BASE_API,
       saveBtnDisabled: false // 保存按钮是否禁用,
     }
   },
@@ -98,6 +133,16 @@ export default {
         console.log(err)
       })
     },
+    close() {
+      this.imagecropperShow = false
+      this.imagecropperKey = this.imagecropperKey + 1
+    },
+    cropSuccess(data) {
+      console.log(data)
+      this.imagecropperKey = this.imagecropperKey + 1
+      this.eduTeacher.avatar = data.items
+      this.imagecropperShow = false
+    }
 
   }
 }
