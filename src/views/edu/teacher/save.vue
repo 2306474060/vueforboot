@@ -56,7 +56,7 @@
           @crop-upload-success="cropSuccess"/>
       </el-form-item>
       <el-form-item>
-        <el-button :disabled="saveBtnDisabled" type="primary" @click="save(eduTeacher)">保存</el-button>
+        <el-button :disabled="saveBtnDisabled" type="primary" @click="saveOrUpdate(eduTeacher)">保存</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -109,7 +109,7 @@ export default {
       this.saveBtnDisabled = true
       teacher.saveOrUpdate(eduTeacher).then(response => {
         alert('success')
-        this.$router.push({ path: '/teacher/table' })
+        this.$router.push({ path: '/table' })
       }).catch(err => {
         this.$message.error(err.message)
         console.log(err)

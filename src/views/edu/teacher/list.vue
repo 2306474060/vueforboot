@@ -2,20 +2,23 @@
   <div class="teacherList">
 
     <!--查询表单-->
-    <el-form :inline="true" class="demo-form-inline">
-      <el-form-item>
-        <el-input v-model="teacherQuery.name" placeholder="讲师名"/>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="teacherQuery.level" clearable placeholder="讲师头衔">
-          <el-option :value="1" label="高级讲师"/>
-          <el-option :value="2" label="首席讲师"/>
-        </el-select>
-      </el-form-item>
+    <div style="margin-top: 10px;margin-left: 10px">
+      <el-form :inline="true" class="demo-form-inline">
 
-      <el-button type="primary" icon="el-icon-search" @click="fetchData()">查询</el-button>
-      <el-button type="default" @click="resetData()">清空</el-button>
-    </el-form>
+        <el-form-item>
+          <el-input v-model="teacherQuery.name" placeholder="讲师名"/>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="teacherQuery.level" clearable placeholder="讲师头衔">
+            <el-option :value="1" label="高级讲师"/>
+            <el-option :value="2" label="首席讲师"/>
+          </el-select>
+        </el-form-item>
+
+        <el-button type="primary" icon="el-icon-search" @click="fetchData()">查询</el-button>
+        <el-button type="default" @click="resetData()">清空</el-button>
+      </el-form>
+    </div>
 
     <el-table
       :data="list"
